@@ -122,6 +122,40 @@ class MessageGenerator {
     } else {
       conformances = ""
     }
+
+    let requestComent = descriptor.protoSourceComments(commentPrefix:"",leadingDetachedPrefix:"/*")
+    if requestComent.count > 0 {
+        let arr = requestComent.components(separatedBy: CharacterSet.init(charactersIn: "@"))
+        let requseInfos = arr.map({ (str) -> (String?,String?) in
+            let subArr = str.components(separatedBy: CharacterSet.init(charactersIn: ":"))
+            if subArr.count > 1 {
+                return (subArr[0],subArr[1].trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
+            }
+            return (nil,nil)
+        })
+
+        p.print(
+            "\n",
+            "\(visibility)struct \(swiftRelativeName)\(conformances)NetParams {\n")
+        p.indent()
+        for info in requseInfos {
+            let pre = info.0
+            let suff = info.1
+
+            if pre != nil && suff != nil {
+                p.print(
+                  "\n",
+                  "\(visibility) static let \(pre!) = \"\(suff!)\" \n")
+            }
+        }
+        p.outdent()
+        p.print("}\n")
+    }
+
+    
+    
+    
+
     p.print(
         "\n",
         descriptor.protoSourceComments(),
@@ -205,6 +239,10 @@ class MessageGenerator {
 
     p.outdent()
     p.print("}\n")
+  }
+
+  func generateRequestInfo(printer p: inout CodePrinter) {
+
   }
 
   func generateEnumCaseIterable(printer p: inout CodePrinter) {
