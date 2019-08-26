@@ -125,19 +125,19 @@ class MessageGenerator {
     p.print(
         "\n",
         descriptor.protoSourceComments(),
-        "\(visibility)struct \(swiftRelativeName)\(conformances) {\n")
+        "\(visibility)struct \(swiftRelativeName)\(conformances) : Mappable {\n")
     p.indent()
-    p.print("// SwiftProtobuf.Message conformance is added in an extension below. See the\n",
-            "// `Message` and `Message+*Additions` files in the SwiftProtobuf library for\n",
-            "// methods supported on all messages.\n")
+    // p.print("// SwiftProtobuf.Message conformance is added in an extension below. See the\n",
+    //         "// `Message` and `Message+*Additions` files in the SwiftProtobuf library for\n",
+    //         "// methods supported on all messages.\n")
 
     for f in fields {
       f.generateInterface(printer: &p)
     }
 
-    p.print(
-        "\n",
-        "\(visibility)var unknownFields = SwiftProtobuf.UnknownStorage()\n")
+    // p.print(
+    //     "\n",
+    //     "\(visibility)var unknownFields = SwiftProtobuf.UnknownStorage()\n")
 
     for o in oneofs {
       o.generateMainEnum(printer: &p)
@@ -159,30 +159,49 @@ class MessageGenerator {
     p.print(
         "\n",
         "\(visibility)init() {}\n")
+    
+    // [wind]添加struct 对 ObjectManager 的支持
+    p.print(
+        "\n",
+        "\(visibility)init?(map: Map) {}\n")
 
-    // Optional extension support
-    if isExtensible {
-      p.print(
-          "\n",
-          "\(visibility)var _protobuf_extensionFieldValues = SwiftProtobuf.ExtensionFieldValueSet()\n")
+    p.print(
+        "\n",
+        "\(visibility) mutating func mapping(map: Map) {\n")
+
+    p.indent()
+    p.indent()
+    for f in fields {
+        f.generateObjectManagerMap(printer: &p)
     }
-    if let storage = storage {
-      if !isExtensible {
-        p.print("\n")
-      }
-      p.print("\(storage.storageVisibility) var _storage = _StorageClass.defaultInstance\n")
-    } else {
-      var subMessagePrinter = CodePrinter()
-      for f in fields {
-        f.generateStorage(printer: &subMessagePrinter)
-      }
-      if !subMessagePrinter.isEmpty {
-        if !isExtensible {
-          p.print("\n")
-        }
-        p.print(subMessagePrinter.content)
-      }
-    }
+
+    p.outdent()
+    p.outdent()
+    p.print(" }\n")
+
+    // // Optional extension support
+    // if isExtensible {
+    //   p.print(
+    //       "\n",
+    //       "\(visibility)var _protobuf_extensionFieldValues = SwiftProtobuf.ExtensionFieldValueSet()\n")
+    // }
+    // if let storage = storage {
+    //   if !isExtensible {
+    //     p.print("\n")
+    //   }
+    //   p.print("\(storage.storageVisibility) var _storage = _StorageClass.defaultInstance\n")
+    // } else {
+    //   var subMessagePrinter = CodePrinter()
+    //   for f in fields {
+    //     f.generateStorage(printer: &subMessagePrinter)
+    //   }
+    //   if !subMessagePrinter.isEmpty {
+    //     if !isExtensible {
+    //       p.print("\n")
+    //     }
+    //     p.print(subMessagePrinter.content)
+    //   }
+    // }
 
     p.outdent()
     p.print("}\n")

@@ -49,7 +49,10 @@ public final class SwiftProtobufNamer {
     if message.containingType != nil {
       return NamingUtils.sanitize(messageName: message.name)
     } else {
-      let prefix = typePrefix(forFile: message.file)
+      // let prefix = typePrefix(forFile: message.file)
+
+      /// [wind] 儿歌项目先写死EXS前缀
+      let prefix = "EXS"
       return NamingUtils.sanitize(messageName: prefix + message.name)
     }
   }
@@ -68,7 +71,10 @@ public final class SwiftProtobufNamer {
     if e.containingType != nil {
       return NamingUtils.sanitize(enumName: e.name)
     } else {
-      let prefix = typePrefix(forFile: e.file)
+      // let prefix = typePrefix(forFile: e.file)
+
+      /// [wind] 儿歌项目先写死EXS前缀
+      let prefix = "EXS"
       return NamingUtils.sanitize(enumName: prefix + e.name)
     }
   }

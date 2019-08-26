@@ -92,6 +92,10 @@ class MessageFieldGenerator: FieldGeneratorBase, FieldGenerator {
         }
     }
 
+    func generateObjectManagerMap(printer p: inout CodePrinter) {
+        p.print("\(swiftName) <- map[\"\(fieldDescriptor.name)\"]\n")
+    }
+
     func generateInterface(printer p: inout CodePrinter) {
         let visibility = generatorOptions.visibilitySourceSnippet
 
@@ -99,23 +103,23 @@ class MessageFieldGenerator: FieldGeneratorBase, FieldGenerator {
 
         if usesHeapStorage {
             p.print(
-              "\(visibility)var \(swiftName): \(swiftType) {\n")
+              "\(visibility)var \(swiftName): \(swiftType)?\n")
             p.indent()
-            let defaultClause = hasFieldPresence ? " ?? \(swiftDefaultValue)" : ""
-            p.print(
-              "get {return _storage.\(underscoreSwiftName)\(defaultClause)}\n",
-              "set {_uniqueStorage().\(underscoreSwiftName) = newValue}\n")
+            let _ = hasFieldPresence ? " ?? \(swiftDefaultValue)" : ""
+            // p.print(
+            //   "get {return _storage.\(underscoreSwiftName)\(defaultClause)}\n",
+            //   "set {_uniqueStorage().\(underscoreSwiftName) = newValue}\n")
             p.outdent()
-            p.print("}\n")
+            // p.print("}\n")
         } else {
             if hasFieldPresence {
-                p.print("\(visibility)var \(swiftName): \(swiftType) {\n")
+                p.print("\(visibility)var \(swiftName): \(swiftType)?\n")
                 p.indent()
-                p.print(
-                  "get {return \(underscoreSwiftName) ?? \(swiftDefaultValue)}\n",
-                  "set {\(underscoreSwiftName) = newValue}\n")
+                // p.print(
+                //   "get {return \(underscoreSwiftName) ?? \(swiftDefaultValue)}\n",
+                //   "set {\(underscoreSwiftName) = newValue}\n")
                 p.outdent()
-                p.print("}\n")
+                // p.print("}\n")
             } else {
                 p.print("\(visibility)var \(swiftName): \(swiftStorageType) = \(swiftDefaultValue)\n")
             }
@@ -123,15 +127,15 @@ class MessageFieldGenerator: FieldGeneratorBase, FieldGenerator {
 
         guard hasFieldPresence else { return }
 
-        let immutableStoragePrefix = usesHeapStorage ? "_storage." : "self."
-        p.print(
-            "/// Returns true if `\(swiftName)` has been explicitly set.\n",
-            "\(visibility)var \(swiftHasName): Bool {return \(immutableStoragePrefix)\(underscoreSwiftName) != nil}\n")
+        // let immutableStoragePrefix = usesHeapStorage ? "_storage." : "self."
+        // p.print(
+        //     "/// Returns true if `\(swiftName)` has been explicitly set.\n",
+        //     "\(visibility)var \(swiftHasName): Bool {return \(immutableStoragePrefix)\(underscoreSwiftName) != nil}\n")
 
-        let mutableStoragePrefix = usesHeapStorage ? "_uniqueStorage()." : "self."
-        p.print(
-            "/// Clears the value of `\(swiftName)`. Subsequent reads from it will return its default value.\n",
-            "\(visibility)mutating func \(swiftClearName)() {\(mutableStoragePrefix)\(underscoreSwiftName) = nil}\n")
+        // let mutableStoragePrefix = usesHeapStorage ? "_uniqueStorage()." : "self."
+        // p.print(
+        //     "/// Clears the value of `\(swiftName)`. Subsequent reads from it will return its default value.\n",
+        //     "\(visibility)mutating func \(swiftClearName)() {\(mutableStoragePrefix)\(underscoreSwiftName) = nil}\n")
     }
 
     func generateStorageClassClone(printer p: inout CodePrinter) {

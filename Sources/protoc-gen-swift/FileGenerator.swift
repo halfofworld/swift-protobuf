@@ -83,11 +83,11 @@ class FileGenerator {
         }
 
         p.print("import Foundation\n")
-        if !fileDescriptor.isBundledProto {
-            // The well known types ship with the runtime, everything else needs
-            // to import the runtime.
-            p.print("import SwiftProtobuf\n")
-        }
+        // if !fileDescriptor.isBundledProto {
+        //     // The well known types ship with the runtime, everything else needs
+        //     // to import the runtime.
+        //     p.print("import SwiftProtobuf\n")
+        // }
         if let neededImports = generatorOptions.protoToModuleMappings.neededModules(forFile: fileDescriptor) {
             p.print("\n")
             for i in neededImports {
@@ -96,7 +96,7 @@ class FileGenerator {
         }
 
         p.print("\n")
-        generateVersionCheck(printer: &p)
+        // generateVersionCheck(printer: &p)
 
         let extensionSet =
             ExtensionSetGenerator(fileDescriptor: fileDescriptor,
@@ -118,7 +118,12 @@ class FileGenerator {
 
         for e in enums {
             e.generateMainEnum(printer: &p)
-            e.generateCaseIterable(printer: &p)
+            // e.generateCaseIterable(printer: &p)
+        }
+
+        /// [wind] 针对Struct 引入 ObjectManager Module
+        if messages.count > 0 {
+            p.print("import ObjectMapper\n")
         }
 
         for m in messages {
@@ -155,24 +160,24 @@ class FileGenerator {
             extensionSet.generateProtobufExtensionDeclarations(printer: &p)
         }
 
-        let protoPackage = fileDescriptor.package
-        let needsProtoPackage: Bool = !protoPackage.isEmpty && !messages.isEmpty
-        if needsProtoPackage || !enums.isEmpty || !messages.isEmpty {
-            p.print(
-                "\n",
-                "// MARK: - Code below here is support for the SwiftProtobuf runtime.\n")
-            if needsProtoPackage {
-                p.print(
-                    "\n",
-                    "fileprivate let _protobuf_package = \"\(protoPackage)\"\n")
-            }
-            for e in enums {
-                e.generateRuntimeSupport(printer: &p)
-            }
-            for m in messages {
-                m.generateRuntimeSupport(printer: &p, file: self, parent: nil)
-            }
-        }
+        // let protoPackage = fileDescriptor.package
+        // let needsProtoPackage: Bool = !protoPackage.isEmpty && !messages.isEmpty
+        // if needsProtoPackage || !enums.isEmpty || !messages.isEmpty {
+        //     p.print(
+        //         "\n",
+        //         "// MARK: - Code below here is support for the SwiftProtobuf runtime.\n")
+        //     if needsProtoPackage {
+        //         p.print(
+        //             "\n",
+        //             "fileprivate let _protobuf_package = \"\(protoPackage)\"\n")
+        //     }
+        //     for e in enums {
+        //         e.generateRuntimeSupport(printer: &p)
+        //     }
+        //     for m in messages {
+        //         m.generateRuntimeSupport(printer: &p, file: self, parent: nil)
+        //     }
+        // }
     }
 
     private func generateVersionCheck(printer p: inout CodePrinter) {

@@ -58,9 +58,9 @@ class EnumGenerator {
 
     p.print("\n")
     p.print(enumDescriptor.protoSourceComments())
-    p.print("\(visibility)enum \(swiftRelativeName): SwiftProtobuf.Enum {\n")
+    p.print("\(visibility)enum \(swiftRelativeName): Int {\n")
     p.indent()
-    p.print("\(visibility)typealias RawValue = Int\n")
+    // p.print("\(visibility)typealias RawValue = Int\n")
 
     // Cases/aliases
     generateCasesOrAliases(printer: &p)
@@ -142,12 +142,12 @@ class EnumGenerator {
         let aliasOfName = namer.relativeName(enumValue: aliasOf)
         p.print("\(visibility)static let \(relativeName) = \(aliasOfName)\n")
       } else {
-        p.print("case \(relativeName) // = \(enumValueDescriptor.number)\n")
+        p.print("case \(relativeName) = \(enumValueDescriptor.number)\n")
       }
     }
-    if enumDescriptor.hasUnknownPreservingSemantics {
-      p.print("case \(unrecognizedCaseName)(Int)\n")
-    }
+    // if enumDescriptor.hasUnknownPreservingSemantics {
+    //   p.print("case \(unrecognizedCaseName)(Int)\n")
+    // }
   }
 
   /// Generates the mapping from case numbers to their text/JSON names.
@@ -183,11 +183,11 @@ class EnumGenerator {
       let dottedName = namer.dottedRelativeName(enumValue: v)
       p.print("case \(v.number): self = \(dottedName)\n")
     }
-    if enumDescriptor.hasUnknownPreservingSemantics {
-      p.print("default: self = .\(unrecognizedCaseName)(rawValue)\n")
-    } else {
+    // if enumDescriptor.hasUnknownPreservingSemantics {
+    //   p.print("default: self = .\(unrecognizedCaseName)(rawValue)\n")
+    // } else {
       p.print("default: return nil\n")
-    }
+    // }
     p.print("}\n")
     p.outdent()
     p.print("}\n")
@@ -206,9 +206,9 @@ class EnumGenerator {
       let dottedName = namer.dottedRelativeName(enumValue: v)
       p.print("case \(dottedName): return \(v.number)\n")
     }
-    if enumDescriptor.hasUnknownPreservingSemantics {
-      p.print("case .\(unrecognizedCaseName)(let i): return i\n")
-    }
+    // if enumDescriptor.hasUnknownPreservingSemantics {
+    //   p.print("case .\(unrecognizedCaseName)(let i): return i\n")
+    // }
     p.print("}\n")
     p.outdent()
     p.print("}\n")

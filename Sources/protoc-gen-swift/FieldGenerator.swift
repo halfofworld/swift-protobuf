@@ -51,6 +51,16 @@ protocol FieldGenerator {
   /// Generate any support needed to this field's value is initialized.
   /// The generated code should return false if it isn't set.
   func generateIsInitializedCheck(printer: inout CodePrinter)
+
+
+  /// [wind]添加对ObjectManager映射支持
+  func generateObjectManagerMap(printer: inout CodePrinter)
+}
+
+extension  FieldGenerator {
+    func generateObjectManagerMap(printer: inout CodePrinter) {
+      
+    }
 }
 
 /// Simple base class for FieldGenerators that also provides fieldMapNames.
